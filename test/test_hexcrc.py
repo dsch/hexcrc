@@ -5,9 +5,13 @@ from hexcrc.hex import parse_line
 
 
 def test_dummy():
-    with open('/home/david/PycharmProjects/hexcrc/test/test.hex') as f:
+    crc = None
+    with open('test.hex') as f:
         line = f.readline()
-        parse_line(line)
+        data = parse_line(line)
+        crc = crc16(data, crc)
+
+    assert crc == 0xE194
 
 
 def test_parse_line_with_data():
@@ -26,6 +30,19 @@ def test_parse_line_invalid_start():
 
 
 def test_crc_check():
-    assert crc16('123456789') == 0x291B
+    assert crc16([ord(c) for c in '123456789']) == 0x29B1
 
 
+def test_crc_check_continue():
+    data = [ord(c) for c in '123456789']
+    crc = crc16(data[0:4])
+    assert crc16(data[4:], crc) == 0x29B1
+
+
+def test_crc_check_magic():
+    data = [0, 0, 0, 0]
+    crc = crc16(data)
+
+    data += [crc >> 8, crc & 0xFF]
+
+    assert crc16(data) == 0
