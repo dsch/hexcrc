@@ -8,7 +8,7 @@ def parse_line(line):
         return
     data = [int(line[i:i + 2], 16) for i in range(9, length + 9, 2)]
 
-    check = (~sum(cs_data + data) & 0xFF) + 1
+    check = (~sum(cs_data + data) + 1) & 0xFF
     checksum = int(line[9 + length:11 + length], 16)
 
     if check != checksum:
